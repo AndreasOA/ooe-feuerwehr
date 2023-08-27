@@ -1,1 +1,8 @@
 pymongo
+json
+streamlit
+folium
+streamlit-folium
+pandas
+pytz
+plotly
