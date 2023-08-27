@@ -7,11 +7,13 @@ from folium.plugins import FastMarkerCluster
 import pandas as pd
 import pytz
 from datetime import datetime, timedelta, date
+import certifi
 import plotly.express as px
 from db_methods import *
 from misc import *
 from st_plots import *
 
+ca = certifi.where()
 ####################################################################################################
 # Load Data
 def apply_district_abr_full(x):
