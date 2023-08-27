@@ -33,7 +33,7 @@ def makeMapsLink(x):
         return ''
 
 
-url = "mongodb+srv://readonlyuser:fet_123_1212@cluster0.wh9klpz.mongodb.net/?retryWrites=true&w=majority"
+url = st.secrets['mongo_db']['url']
 dbm = DbMethods(url)
 data = dbm.dbGetAll()
 data['district_long'] = data['district'].apply(lambda x: apply_district_abr_full(x))
