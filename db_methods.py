@@ -5,8 +5,8 @@ from db_template import db_template
 
 
 class DbMethods:
-    def __init__(self, url):
-        self.client = MongoClient(url)
+    def __init__(self, url, ca):
+        self.client = MongoClient(url, tlsCAFile=ca)
         self.db = self.client['einsatztracker']
         self.collection = self.db['einsaetze']
     

@@ -13,7 +13,7 @@ from db_methods import *
 from misc import *
 from st_plots import *
 
-ca = certifi.where()
+
 ####################################################################################################
 # Load Data
 def apply_district_abr_full(x):
@@ -36,7 +36,8 @@ def makeMapsLink(x):
 
 
 url = st.secrets['mongo_db']['url']
-dbm = DbMethods(url)
+ca = certifi.where()
+dbm = DbMethods(url, ca)
 data = dbm.dbGetAll()
 data['district_long'] = data['district'].apply(lambda x: apply_district_abr_full(x))
 data['date'] = pd.to_datetime(data['date'])
