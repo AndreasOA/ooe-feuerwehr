@@ -6,7 +6,7 @@ from db_template import db_template
 
 class DbMethods:
     def __init__(self, url):
-        self.client = MongoClient(url, sl_cert_reqs=ssl.CERT_NONE)
+        self.client = MongoClient(url)
         self.db = self.client['einsatztracker']
         self.collection = self.db['einsaetze']
     
