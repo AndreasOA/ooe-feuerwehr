@@ -7,7 +7,6 @@ from folium.plugins import FastMarkerCluster
 import pandas as pd
 import pytz
 from datetime import datetime, timedelta, date
-import certifi
 import plotly.express as px
 from db_methods import *
 from misc import *
@@ -36,8 +35,7 @@ def makeMapsLink(x):
 
 
 url = st.secrets['mongo_db']['url']
-ca = certifi.where()
-dbm = DbMethods(url, ca)
+dbm = DbMethods(url)
 data = dbm.dbGetAll()
 data['district_long'] = data['district'].apply(lambda x: apply_district_abr_full(x))
 data['date'] = pd.to_datetime(data['date'])
