@@ -71,5 +71,3 @@ This project is open-source and available under the [MIT License](https://github
 © 2023 AndreasOA
 
 ---
-
-*Note: This README is stylized in Markdown for GitHub repositories or any other platforms that support Markdown rendering. Make sure to replace the placeholder banner URL with an actual image if available.*
