@@ -1,4 +1,4 @@
-# OÖ Feuerwehr Einsatz Tracker README
+# OÖ Feuerwehr Einsatz Tracker
 
 ![Header Banner](banner.png)
 
