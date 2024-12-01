@@ -6,7 +6,7 @@
 
 **OÖ Feuerwehr Einsatz Tracker** is an intuitive live emergency tracker for Upper Austria (Oberösterreich, OÖ). It provides real-time insights into ongoing emergency situations, ensuring efficient communication and coordination for those on the ground.
 
-[**Visit the Live Tracker**](https://ooe-feuerwehr.streamlit.app)
+[**Visit the Live Tracker**](https://ooe-feuerwehr.2code.at)
 
 ---
 
@@ -44,7 +44,6 @@
 - **Contact**:
   - [Twitter](https://twitter.com/heyandio)
   - [GitHub](https://github.com/AndreasOA)
-  - [Website](https://a-o.dev)
 
 ---
 
