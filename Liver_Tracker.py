@@ -15,7 +15,17 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+# Set page to wide mode
+st.set_page_config(
+    layout="wide",
+    menu_items={
+        'Get Help': None,
+        'Report a bug': None,
+        'About': None
+    }
+)
 
+dbm = DbMethods()
 
 ####################################################################################################
 # Load Data
@@ -37,9 +47,11 @@ def makeMapsLink(x):
     except:
         return ''
 
-url = os.getenv('MONGO_DB_URL_READ_ONLY')
-dbm = DbMethods(url)
-data = dbm.dbGetAll()
+@st.cache_data(ttl=600)
+def load_data():
+    return dbm.dbGetAll()
+
+data = load_data()
 data['district_long'] = data['district'].apply(lambda x: apply_district_abr_full(x))
 data["lon"] = pd.to_numeric(data["lon"])
 data["lat"] = pd.to_numeric(data["lat"])
@@ -65,8 +77,7 @@ st.sidebar.markdown(f"[Telegram Gruppe]({telegram_link})")
 st.sidebar.header("Kontakt")
 socials = {
     "Twitter": "https://twitter.com/heyandio",
-    "GitHub ": "https://github.com/AndreasOA",
-    "Website": "https://a-o.dev"
+    "GitHub ": "https://github.com/AndreasOA"
 }
 
 for social, link in socials.items():
@@ -74,19 +85,19 @@ for social, link in socials.items():
 ####################################################################################################
 # Content
 st.divider()
-st.subheader("Statistik der letzten 24 Stunden:")
-col1, col2, col3 = st.columns([1,1,2])
+st.subheader("Statistik:")
+col1, col2, col3 = st.columns(3)
 current_time = datetime.now(pytz.FixedOffset(120))
 time_24_hours_ago = current_time - timedelta(days=1)
 # Now you can safely compare because both are offset-naive
 data_24_hours = data[((data['date'] >= time_24_hours_ago) & (data['date'] <= current_time))]
-activeData = data[data['status'] == 'Aktiv']
+activeData = data[data['status'] == 'Aktiv'].sort_values('date', ascending=False)
 try:
     most_common_task_type = data_24_hours['type'].value_counts().idxmax()
 except ValueError:
     most_common_task_type = "Keine Daten"
 col1.metric("Laufende Einsätze", len(data[data['status'] == 'Aktiv']))
-col2.metric("Einsätze insgesamt", len(data_24_hours))
+col2.metric("Einsätze in den letzten 24 Stunden", len(data_24_hours))
 col3.metric("Häufigste Einsatzart", most_common_task_type)
 st.divider()
 st.title("Aktive Einsätze")
@@ -94,8 +105,8 @@ if len(activeData) == 0:
     st.warning("Keine aktiven Einsätze")
 else:
     activeTaskTable(activeData)
-    taskMapPlot(activeData, legend=False)
+    taskMapPlot(activeData)
 st.divider()
 st.title("Alle Einsätze der letzten 24 Stunden")
-activeTaskTable(data_24_hours)
+activeTaskTable(data_24_hours.sort_values('date', ascending=False))
 st.divider()
