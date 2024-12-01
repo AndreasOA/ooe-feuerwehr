@@ -1,15 +1,9 @@
-FROM python:3.9 AS core
+FROM python:3.12-slim AS core
 
 WORKDIR /root
 
-RUN pip3 install ipykernel \
-pymongo \
-streamlit \
-pandas \
-streamlit_folium \
-plotly \
-folium \
-pytz
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
 FROM core AS dev
 
