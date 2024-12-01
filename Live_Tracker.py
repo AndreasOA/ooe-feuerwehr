@@ -32,12 +32,17 @@ def makeMapsLink(x):
     except:
         return ''
 
-
-url = st.secrets['mongo_db']['url']
+url = "mongodb+srv://readonlyuser:fet_123_1212@cluster0.wh9klpz.mongodb.net/?retryWrites=true&w=majority"
 dbm = DbMethods(url)
 data = dbm.dbGetAll()
 data['district_long'] = data['district'].apply(lambda x: apply_district_abr_full(x))
-data['date'] = pd.to_datetime(data['date'])
+data["lon"] = pd.to_numeric(data["lon"])
+data["lat"] = pd.to_numeric(data["lat"])
+res = []
+for i, elem in data.iterrows():
+    res.append(pd.to_datetime(elem['date']))
+data['date'] = res
+data['date'] = data['date'].apply(lambda x: x.tz_localize('UTC') if x.tzinfo is None else x.tz_convert('UTC'))
 data['map_url'] =  data.apply(lambda row: makeMapsLink(row), axis=1)
 data['city'] = data['city'].apply(lambda x: format_city(x))
 if 'dataframe' not in st.session_state:
@@ -68,10 +73,13 @@ st.subheader("Statistik der letzten 24 Stunden:")
 col1, col2, col3 = st.columns([1,1,2])
 current_time = datetime.now(pytz.FixedOffset(120))
 time_24_hours_ago = current_time - timedelta(days=1)
-data_24_hours = data[(data['date'] >= time_24_hours_ago) & (data['date'] <= current_time)]
+# Now you can safely compare because both are offset-naive
+data_24_hours = data[((data['date'] >= time_24_hours_ago) & (data['date'] <= current_time))]
 activeData = data[data['status'] == 'Aktiv']
-
-most_common_task_type = data_24_hours['type'].value_counts().idxmax()
+try:
+    most_common_task_type = data_24_hours['type'].value_counts().idxmax()
+except ValueError:
+    most_common_task_type = "Keine Daten"
 col1.metric("Laufende Einsätze", len(data[data['status'] == 'Aktiv']))
 col2.metric("Einsätze insgesamt", len(data_24_hours))
 col3.metric("Häufigste Einsatzart", most_common_task_type)
