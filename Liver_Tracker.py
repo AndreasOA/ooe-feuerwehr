@@ -18,6 +18,7 @@ load_dotenv()
 # Set page to wide mode
 st.set_page_config(
     layout="wide",
+    page_icon="🚨",
     menu_items={
         'Get Help': None,
         'Report a bug': None,
