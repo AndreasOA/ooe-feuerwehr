@@ -4,9 +4,37 @@ import requests
 from time import sleep
 import pandas as pd
 from pymongo.mongo_client import MongoClient
+from db_methods import DbMethods
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
-def db_template(id: str, status: str, symbol_type: str, type: str, date: str, info: str, lon: float, lat: float, city: str, district: str, street: str, cnt_fire_dep: int):
+API_URL = os.getenv('FIRE_DEP_URL')
+T_API = os.getenv('TELEGRAM_API_TOKEN')
+T_ID = os.getenv('TELEGRAM_GROUP_ID')
+T_URL = f"https://api.telegram.org/bot{T_API}/sendMessage?chat_id={T_ID}&text="
+MONGO_DB_URL_READ_WRITE = os.getenv('MONGO_DB_URL_READ_WRITE')
+DEBUG = True
+
+
+
+
+def db_template(
+    id: str,
+    status: str,
+    symbol_type: str,
+    type: str,
+    date: str,
+    info: str,
+    lon: float,
+    lat: float,
+    city: str,
+    district: str,
+    street: str,
+    cnt_fire_dep: int
+):
     return {"id":id,
             "status":status,
             "symbol_type":symbol_type,
@@ -244,29 +272,6 @@ district_full_abr = dict((v,k) for k,v in district_abr_full.items())
 def _notifyUser(url, msg):
         requests.get(url+msg).json()
 
-class DbMethods:
-    def __init__(self, url):
-        self.client = MongoClient(url)
-        self.db = self.client['einsatztracker']
-        self.collection = self.db['einsaetze']
-    
-
-    def dbPost(self, data: dict):
-        self.collection.insert_one(db_template(**data))
-
-
-    def dbGetAll(self) -> pd.DataFrame:
-        return pd.DataFrame(list(self.collection.find({})))
-    
-
-    def dbGetOne(self, dbFilter: dict) -> dict:
-        return self.collection.find_one(dbFilter)
-    
-
-    def dbUpdateOne(self, dbFilter: dict, newContent: dict):
-        return self.collection.update_one(dbFilter, {"$set": newContent})
-
-
 def getTaskType(task: dict) -> tuple:
     try:
         if "Brandmeldealarm" in task['einsatztyp']['text'].lower():
@@ -347,24 +352,14 @@ def postNewTasks(new_tasks: list, old_tasks: pd.DataFrame, dbm: classmethod, t_u
             dbm.dbPost(task)
 
 
-def runTaskPipeline(dbm: classmethod, api_url: str, t_url: str, debug: bool = False):
-    new_tasks = getNewTasks(api_url)
+def runTaskPipeline(dbm: classmethod, debug: bool = False):
+    new_tasks = getNewTasks(API_URL)
     old_tasks = dbm.dbGetAll()
-    postNewTasks(new_tasks, old_tasks, dbm, t_url, debug)
-    updateTasks(new_tasks, old_tasks, t_url, debug)
+    postNewTasks(new_tasks, old_tasks, dbm, T_URL, debug)
+    updateTasks(new_tasks, old_tasks, T_URL, debug)
 
 
 
 if __name__ == '__main__':
-    DEBUG = True
-    
-    f = open("credentials_ft.json")
-    data_json = json.load(f)
-    f.close()
-    db_url = data_json['mongo_db']['url']
-    api_url = data_json['fire_dep']['url']
-    t_api = data_json['telegram']['api_token']
-    t_id = data_json['telegram']['group_id']
-    t_url = f"https://api.telegram.org/bot{t_api}/sendMessage?chat_id={t_id}&text="
-    dbm = DbMethods(db_url)
-    runTaskPipeline(dbm, api_url, t_url, DEBUG)
+    dbm = DbMethods()
+    runTaskPipeline(dbm, DEBUG)

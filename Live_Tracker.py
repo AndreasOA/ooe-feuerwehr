@@ -11,6 +11,11 @@ import plotly.express as px
 from db_methods import *
 from misc import *
 from st_plots import *
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 ####################################################################################################
 # Load Data
@@ -32,7 +37,7 @@ def makeMapsLink(x):
     except:
         return ''
 
-url = "mongodb+srv://readonlyuser:fet_123_1212@cluster0.wh9klpz.mongodb.net/?retryWrites=true&w=majority"
+url = os.getenv('MONGO_DB_URL_READ_ONLY')
 dbm = DbMethods(url)
 data = dbm.dbGetAll()
 data['district_long'] = data['district'].apply(lambda x: apply_district_abr_full(x))

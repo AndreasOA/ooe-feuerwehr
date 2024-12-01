@@ -2,11 +2,14 @@ from pymongo.mongo_client import MongoClient
 import json
 import pandas as pd
 from db_template import db_template
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 class DbMethods:
-    def __init__(self, url):
-        self.client = MongoClient(url)
+    def __init__(self):
+        self.client = MongoClient(os.getenv('MONGO_DB_URL_READ_WRITE'))
         self.db = self.client['einsatztracker']
         self.collection = self.db['einsaetze']
     
@@ -32,8 +35,4 @@ class DbMethods:
 
 
 if __name__ == '__main__':
-    f = open("credentials.json", 'r')
-    data_json = json.load(f)
-    f.close()
-    url = data_json['mongo_db']['url']
-    dbm = DbMethods(url)
+    dbm = DbMethods()
